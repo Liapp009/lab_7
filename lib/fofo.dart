@@ -96,6 +96,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
   }
 
+  // 공통 데코레이션 스타일
   InputDecoration _inputDecoration({
     required String label,
     String? hint,
