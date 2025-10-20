@@ -57,14 +57,27 @@ class _RegistrationPageState extends State<RegistrationPage> {
     super.dispose();
   }
 
-  // Validation
-  String? _validateName(String? v) =>
-      (v == null || v.trim().isEmpty) ? 'Name is required' : null;
+  String? _validateName(String? v) {
+    if (v == null || v.trim().isEmpty) return 'Name is required';
+    if (v.trim().length < 2) return 'Name must be at least 2 characters';
+    if (v.trim().length > 10) return 'Name cannot exceed 10 characters';
+    return null;
+  }
 
   String? _validateEmail(String? v) {
     if (v == null || v.trim().isEmpty) return 'Email is required';
     final emailRegex = RegExp(r'^[\w\.-]+@([\w-]+\.)+[\w-]{2,}$');
-    if (!emailRegex.hasMatch(v.trim())) return 'Enter valid email';
+    if (!emailRegex.hasMatch(v.trim())) return 'Enter a valid email';
+    return null;
+  }
+
+  String? _validatePhone(String? v) {
+    if (v == null || v.trim().isEmpty) return 'Phone number is required';
+    // (XXX) XXX-XXXX format check
+    final phoneRegex = RegExp(r'^\(\d{3}\)\s\d{3}-\d{4}$');
+    if (!phoneRegex.hasMatch(v.trim())) {
+      return 'Phone must be in format: (XXX) XXX-XXXX';
+    }
     return null;
   }
 
@@ -110,10 +123,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
       prefixIcon: prefix != null ? Icon(prefix, color: Colors.blue) : null,
       suffixIcon: suffix,
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.all(Radius.circular(20.0)),
-        borderSide: BorderSide(color: Colors.black, width: 2.0),
+        borderRadius: const BorderRadius.all(Radius.circular(20.0)),
+        borderSide: const BorderSide(color: Colors.black, width: 2.0),
       ),
-      focusedBorder: OutlineInputBorder(
+      focusedBorder: const OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(20.0)),
         borderSide: BorderSide(color: Colors.blue, width: 2.0),
       ),
@@ -155,17 +168,17 @@ class _RegistrationPageState extends State<RegistrationPage> {
               controller: _phoneCtrl,
               focusNode: _phoneFocus,
               keyboardType: TextInputType.phone,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               decoration: _inputDecoration(
                 label: 'Phone Number *',
-                hint: 'Where can we reach you?',
-                helper: 'Phone format: (XXX)XXX-XXXX',
+                hint: 'Enter (XXX) XXX-XXXX',
+                helper: 'Phone format: (XXX) XXX-XXXX',
                 prefix: Icons.call,
                 suffix: IconButton(
                   icon: const Icon(Icons.delete_outline, color: Colors.red),
                   onPressed: () => _phoneCtrl.clear(),
                 ),
               ),
+              validator: _validatePhone,
               onFieldSubmitted: (_) =>
                   FocusScope.of(context).requestFocus(_emailFocus),
             ),
@@ -174,7 +187,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
               controller: _emailCtrl,
               focusNode: _emailFocus,
               keyboardType: TextInputType.emailAddress,
-              textInputAction: TextInputAction.next,
               decoration: _inputDecoration(
                 label: 'Email Address',
                 prefix: Icons.email,
