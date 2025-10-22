@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lab_7/constant/app_colors.dart';
 
 void main() => runApp(const MyApp());
 
@@ -73,7 +74,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   String? _validatePhone(String? v) {
     if (v == null || v.trim().isEmpty) return 'Phone number is required';
-    // (XXX) XXX-XXXX format check
+
     final phoneRegex = RegExp(r'^\(\d{3}\)\s\d{3}-\d{4}$');
     if (!phoneRegex.hasMatch(v.trim())) {
       return 'Phone must be in format: (XXX) XXX-XXXX';
@@ -120,7 +121,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
       labelText: label,
       hintText: hint,
       helperText: helper,
-      prefixIcon: prefix != null ? Icon(prefix, color: Colors.blue) : null,
+      prefixIcon:
+          prefix != null ? Icon(prefix, color: AppColors.secondary) : null,
       suffixIcon: suffix,
       enabledBorder: OutlineInputBorder(
         borderRadius: const BorderRadius.all(Radius.circular(20.0)),
@@ -236,7 +238,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
             const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
+                backgroundColor: AppColors.tretiary,
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
               onPressed: _submitForm,
