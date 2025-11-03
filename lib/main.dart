@@ -1,16 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:lab_7/constant/app_colors.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'constants/app_colors.dart';
 
-void main() => runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
+
+  runApp(
+    EasyLocalization(
+      supportedLocales: const [Locale('en'), Locale('ko')],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('en'),
+      child: const MyApp(),
+    ),
+  );
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Lab7 Registration',
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       home: const RegistrationPage(),
       routes: {
         UserInfoPage.routeName: (ctx) => const UserInfoPage(),
@@ -42,6 +58,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final _confirmFocus = FocusNode();
 
   bool _hidePass = true;
+  bool _isKorean = false;
 
   @override
   void dispose() {
@@ -96,7 +113,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      print('Form is valid');
       Navigator.of(context).pushNamed(
         UserInfoPage.routeName,
         arguments: UserInfoArgs(
@@ -105,8 +121,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
           phone: _phoneCtrl.text.trim(),
         ),
       );
-    } else {
-      print('Form is not valid! Please review and correct.');
     }
   }
 
@@ -124,9 +138,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
       prefixIcon:
           prefix != null ? Icon(prefix, color: AppColors.secondary) : null,
       suffixIcon: suffix,
-      enabledBorder: OutlineInputBorder(
-        borderRadius: const BorderRadius.all(Radius.circular(20.0)),
-        borderSide: const BorderSide(color: Colors.black, width: 2.0),
+      enabledBorder: const OutlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(20.0)),
+        borderSide: BorderSide(color: Colors.black, width: 2.0),
       ),
       focusedBorder: const OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(20.0)),
@@ -139,9 +153,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Register Form'),
+        title: Text('register_form'.tr()),
         centerTitle: true,
-        backgroundColor: Colors.blue,
+        backgroundColor: AppColors.primary,
       ),
       body: Form(
         key: _formKey,
@@ -153,7 +167,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
               focusNode: _nameFocus,
               textInputAction: TextInputAction.next,
               decoration: _inputDecoration(
-                label: 'Full Name *',
+                label: 'full_name'.tr(),
                 hint: 'What do people call you?',
                 prefix: Icons.person,
                 suffix: IconButton(
@@ -171,7 +185,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
               focusNode: _phoneFocus,
               keyboardType: TextInputType.phone,
               decoration: _inputDecoration(
-                label: 'Phone Number *',
+                label: 'phone_number'.tr(),
                 hint: 'Enter (XXX) XXX-XXXX',
                 helper: 'Phone format: (XXX) XXX-XXXX',
                 prefix: Icons.call,
@@ -190,7 +204,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
               focusNode: _emailFocus,
               keyboardType: TextInputType.emailAddress,
               decoration: _inputDecoration(
-                label: 'Email Address',
+                label: 'email_address'.tr(),
                 prefix: Icons.email,
               ),
               validator: _validateEmail,
@@ -204,7 +218,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
               obscureText: _hidePass,
               maxLength: 8,
               decoration: _inputDecoration(
-                label: 'Password *',
+                label: 'password'.tr(),
                 hint: 'Enter the password',
                 prefix: Icons.lock,
                 suffix: IconButton(
@@ -229,7 +243,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
               focusNode: _confirmFocus,
               obscureText: true,
               decoration: _inputDecoration(
-                label: 'Confirm Password *',
+                label: 'confirm_password'.tr(),
                 prefix: Icons.lock_outline,
               ),
               validator: _validateConfirm,
@@ -238,14 +252,36 @@ class _RegistrationPageState extends State<RegistrationPage> {
             const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.tretiary,
+                backgroundColor: AppColors.tertiary,
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
               onPressed: _submitForm,
-              child: const Text(
-                'Submit Form',
-                style: TextStyle(color: Colors.white, fontSize: 16),
+              child: Text(
+                'submit_form'.tr(),
+                style: const TextStyle(color: Colors.white, fontSize: 16),
               ),
+            ),
+            const SizedBox(height: 20),
+            // ✅ 언어 변경 버튼 추가
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () async {
+                    await context.setLocale(const Locale('en'));
+                    setState(() => _isKorean = false);
+                  },
+                  child: const Text('EN'),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () async {
+                    await context.setLocale(const Locale('ko'));
+                    setState(() => _isKorean = true);
+                  },
+                  child: const Text('KO'),
+                ),
+              ],
             ),
           ],
         ),
