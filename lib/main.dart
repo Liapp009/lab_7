@@ -262,7 +262,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
               ),
             ),
             const SizedBox(height: 20),
-            // ✅ 언어 변경 버튼 추가
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
